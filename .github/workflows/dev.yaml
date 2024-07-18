@@ -14,7 +14,7 @@ jobs:
         run: |
           docker login -u abdilahboutizwa -p ${{ secrets.GHCR_PAT }} ghcr.io
           docker build -f docker/dockerfiles/dockerfile.production -t ghcr.io/abdilahboutizwa/auto-bilal-api:dev .
-          docker push ghcr.io/abdilahboutizwa/cinq-a-sec-api:dev
+          docker push ghcr.io/abdilahboutizwa/auto-bilal-api:dev
 
   deploy:
     name: DEPLOY
