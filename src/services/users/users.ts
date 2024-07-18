@@ -17,29 +17,11 @@ import {
 import type { Application } from '../../declarations'
 import { UserService, getOptions } from './users.class'
 
-import { fastJoin } from 'feathers-hooks-common'
-
 export const userPath = 'users'
 export const userMethods: Array<keyof UserService> = ['find', 'get', 'create', 'patch', 'remove']
 
 export * from './users.class'
 export * from './users.schema'
-
-const query = {
-  role: true,
-  entity: true
-}
-
-const userResolvers = {
-  joins: {
-    role: () => async (user: any, context: any) => {
-      user.role = await context.app.service('roles').get(user.role_id)
-    },
-    entity: () => async (user: any, context: any) => {
-      user.entity = await context.app.service('entities').get(user.entity_id)
-    }
-  }
-}
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const user = (app: Application) => {
@@ -70,7 +52,7 @@ export const user = (app: Application) => {
       remove: []
     },
     after: {
-      all: [fastJoin(userResolvers, query)]
+      all: []
     },
     error: {
       all: []

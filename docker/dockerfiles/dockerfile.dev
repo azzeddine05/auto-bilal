@@ -10,7 +10,7 @@ COPY . .
 
 RUN yarn compile
 
-RUN rm -R src
+# RUN rm -R src
 
 EXPOSE 3030
 
