@@ -1,0 +1,17 @@
+FROM node:latest
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN yarn
+
+COPY . .
+
+RUN yarn compile
+
+RUN rm -R src
+
+EXPOSE 3030
+
+CMD ["yarn", "start"]

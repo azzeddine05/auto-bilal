@@ -1,0 +1,80 @@
+version: "3.5"
+
+services:
+  traefik:
+    image: "traefik"
+    container_name: bilal_auto_traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Don't do this in production!
+    volumes:
+      - ./docker/dev/traefik:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - bilal_auto_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=web,websecure
+      - traefik.http.routers.traefik.rule=Host(`traefik.bilal-auto.localhost`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.middlewares.cors.headers.customResponseHeaders.Access-Control-Allow-Origin=http://localhost:8888
+      - traefik.http.middlewares.cors.headers.accesscontrolallowmethods=*
+      - traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=*
+      - traefik.http.middlewares.cors.headers.accesscontrolmaxage=100
+      - traefik.http.middlewares.cors.headers.addvaryheader=true
+
+  database:
+    image: postgres:latest
+    container_name: bilal_auto_database
+    environment:
+      POSTGRES_DB: bilal_auto_db
+      POSTGRES_PASSWORD: bilal_auto_password
+      POSTGRES_USER: bilal_auto_user
+    volumes:
+      - bilal_auto_data:/var/lib/postgresql/data
+    networks:
+      - bilal_auto_network
+
+  adminer:
+    image: adminer
+    container_name: bilal_auto_adminer
+    restart: always
+    networks:
+      - bilal_auto_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.adminer.rule=Host(`adminer.bilal-auto.localhost`)
+      - traefik.http.routers.adminer.entrypoints=web,websecure
+      - traefik.http.services.adminer.loadbalancer.server.port=8080
+
+  api:
+    container_name: bilal_auto_api
+    depends_on:
+      - database
+    build:
+      context: .
+      dockerfile: docker/dockerfiles/dockerfile.dev
+    restart: unless-stopped
+    environment:
+      - ORIGINS=http://localhost:3000
+    networks:
+      - bilal_auto_network
+    ports:
+      - 3030:3030
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`api.bilal-auto.localhost`)
+      - traefik.http.routers.api.entrypoints=web,websecure
+      - traefik.http.services.api.loadbalancer.server.port=3030
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/usr/src/app
+
+networks:
+  bilal_auto_network:
+    name: bilal_auto_network
+
+volumes:
+  bilal_auto_data:

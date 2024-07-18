@@ -1,0 +1,37 @@
+{
+  "host": "localhost",
+  "port": 3030,
+  "public": "./public/",
+  "origins": [
+    "http://localhost:3030"
+  ],
+  "paginate": {
+    "default": 10,
+    "max": 999
+  },
+  "postgresql": {
+    "client": "pg",
+    "connection": "postgres://bilal_auto_user:bilal_auto_password@database/bilal_auto_db"
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "users",
+    "secret": "qjH7FG9scARzNEzv3BZOSAlGloHTIDSo",
+    "authStrategies": [
+      "jwt",
+      "local"
+    ],
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://auto-bilal.com",
+      "algorithm": "HS256",
+      "expiresIn": "99d"
+    },
+    "local": {
+      "usernameField": "email",
+      "passwordField": "password"
+    }
+  }
+}

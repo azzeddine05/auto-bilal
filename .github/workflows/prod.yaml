@@ -1,0 +1,31 @@
+name: API CI/CD - PROD
+on:
+  workflow_dispatch:
+jobs:
+  build-and-push:
+    name: Build and Push to GHCR.IO
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build, Tag, and Push the Image to GHCR.IO
+        id: build-image
+        run: |
+          docker login -u ismailgeek -p ${{ secrets.GHCR_PAT }} ghcr.io
+          docker build -f docker/dockerfiles/dockerfile.production -t ghcr.io/abdilaboutizwa/cinq-a-sec-api:prod .
+          docker push ghcr.io/abdilaboutizwa/cinq-a-sec-api:prod
+
+  deploy:
+    name: DEPLOY
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to dev server and restart app
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_IP }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: cd /home/debian && ./deploy_api.sh

@@ -1,0 +1,81 @@
+version: "3.5"
+
+services:
+  traefik:
+    image: "traefik:v2.5"
+    container_name: cinqasec_traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      # (Optional) Expose Dashboard
+      - "8080:8080" # Don't do this in production!
+    volumes:
+      - ./docker/dev/traefik:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - cinqasec_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=web,websecure
+      - traefik.http.routers.traefik.rule=Host(`traefik.5-asec.com`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.domains[0].main=5-asec.com
+      - traefik.http.routers.traefik.tls.domains[0].sans=*.5-asec.com
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls.certresolver=production
+
+  database:
+    image: postgres:latest
+    container_name: cinqasec_database
+    environment:
+      POSTGRES_DB: cinqasec_db
+      POSTGRES_PASSWORD: cinqasec_password
+      POSTGRES_USER: cinqasec_user
+    volumes:
+      - cinqasec_data:/var/lib/postgresql/data
+    networks:
+      - cinqasec_network
+
+  adminer:
+    image: adminer
+    container_name: cinqasec_adminer
+    restart: always
+    networks:
+      - cinqasec_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.adminer.rule=Host(`adminer.5-asec.com`)
+      - traefik.http.routers.adminer.tls=true
+      - traefik.http.routers.adminer.entrypoints=web,websecure
+      - traefik.http.services.adminer.loadbalancer.server.port=80
+      - traefik.http.routers.adminer.tls.certresolver=production
+
+  api:
+    container_name: cinqasec_api
+    depends_on:
+      - database
+    image: ghcr.io/abdilaboutizwa/cinq-a-sec-api:dev
+    restart: unless-stopped
+    networks:
+      - cinqasec_network
+    ports:
+      - 3030:3030
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`api.5-asec.com`)
+      - traefik.http.routers.api.tls=true
+      - traefik.http.routers.api.entrypoints=web,websecure
+      - traefik.http.services.api.loadbalancer.server.port=3030
+      - traefik.http.routers.api.tls.certresolver=production
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/usr/src/app
+
+networks:
+  cinqasec_network:
+    name: cinqasec_network
+
+volumes:
+  cinqasec_data:
