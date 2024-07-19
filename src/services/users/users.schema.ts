@@ -7,6 +7,8 @@ import { passwordHash } from '@feathersjs/authentication-local'
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
 import type { UserService } from './users.class'
+import { roleSchema } from '../roles/roles.schema'
+import { entitySchema } from '../entities/entities.schema'
 
 // Main data model schema
 export const userSchema = Type.Object(
@@ -22,7 +24,9 @@ export const userSchema = Type.Object(
     reminder_1: Type.Optional(Type.Number()),
     reminder_2: Type.Optional(Type.Number()),
     reminder_every: Type.Optional(Type.Number()),
-    is_active: Type.Optional(Type.Boolean())
+    is_active: Type.Optional(Type.Boolean()),
+    role: Type.Optional(Type.Any()),
+    entity: Type.Optional(Type.Any()),
   },
   { $id: 'User', additionalProperties: false }
 )
@@ -32,7 +36,15 @@ export const userResolver = resolve<User, HookContext<UserService>>({})
 
 export const userExternalResolver = resolve<User, HookContext<UserService>>({
   // The password should never be visible externally
-  password: async () => undefined
+  password: async () => undefined,
+  role: async (value, user: User, context) => {
+    const role = await context.app.service('roles').get(user.role_id);
+    return role;
+  },
+  entity: async (value, user: User, context) => {
+    const entity = await context.app.service('entities').get(user.entity_id);
+    return entity;
+  },
 })
 
 // Schema for creating new entries

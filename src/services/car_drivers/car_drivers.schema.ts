@@ -14,7 +14,7 @@ export const carDriverSchema = Type.Object(
     car_id: Type.Number(),
     driver_id: Type.Number(),
     start_date: Type.String(),
-    end_date: Type.String()
+    end_date: Type.Optional(Type.String())
   },
   { $id: 'CarDriver', additionalProperties: false }
 )
@@ -46,7 +46,6 @@ export const carDriverPatchResolver = resolve<CarDriver, HookContext<CarDriverSe
 
 // Schema for allowed query properties
 export const carDriverQueryProperties = Type.Pick(carDriverSchema, [
-  'id',
   'car_id',
   'driver_id',
   'start_date',

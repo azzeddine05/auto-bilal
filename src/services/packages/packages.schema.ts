@@ -14,7 +14,7 @@ export const packageSchema = Type.Object(
     name: Type.String(),
     description: Type.String(),
     price: Type.Number(),
-    features: Type.Array(Type.String()),
+    features: Type.Array(Type.Object({ name: Type.String() })),
     total_cars: Type.Number(),
     total_drivers: Type.Number(),
     is_active: Type.Boolean()
@@ -60,7 +60,11 @@ export const packageQueryProperties = Type.Pick(packageSchema, [
 ])
 export const packageQuerySchema = Type.Intersect(
   [
-    querySyntax(packageQueryProperties),
+    querySyntax(packageQueryProperties, {
+      name: { $like: Type.String() },
+      description: { $like: Type.String() },
+      price: { $like: Type.String() },
+    }),
     // Add additional query properties here
     Type.Object({}, { additionalProperties: false })
   ],

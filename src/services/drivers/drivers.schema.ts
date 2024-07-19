@@ -35,7 +35,11 @@ export const driverSchema = Type.Object(
     plate_number: Type.Optional(Type.String()),
     reference_1: Type.Optional(Type.String()),
     reference_2: Type.Optional(Type.String()),
-    comment: Type.Optional(Type.String())
+    comment: Type.Optional(Type.String()),
+    
+    
+    cars: Type.Optional(Type.Array(Type.Any()))
+
   },
   { $id: 'Driver', additionalProperties: false }
 )
@@ -43,7 +47,19 @@ export type Driver = Static<typeof driverSchema>
 export const driverValidator = getValidator(driverSchema, dataValidator)
 export const driverResolver = resolve<Driver, HookContext<DriverService>>({})
 
-export const driverExternalResolver = resolve<Driver, HookContext<DriverService>>({})
+export const driverExternalResolver = resolve<Driver, HookContext<DriverService>>({
+  cars: async (value, driver, context) => {
+    console.log('value', driver?.id);
+    const cars = await context.app.service('car_drivers').find({
+      query: {
+        $skip: 0,
+        $limit: 999,
+        driver_id: driver?.id
+      },
+    });
+    return cars?.data;
+  }
+})
 
 // Schema for creating new entries
 export const driverDataSchema = Type.Pick(

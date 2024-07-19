@@ -18,9 +18,11 @@ const app: Application = koa(feathers())
 app.configure(configuration(configurationValidator))
 
 // Set up Koa middleware
+const origins = app.get('origins')?.[0];
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: origins ?? "http://localhost:3000",
     credentials: true
   })
 )

@@ -22,6 +22,7 @@ export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
     paginate: app.get('paginate'),
     Model: app.get('postgresqlClient'),
-    name: 'car_drivers'
+    name: 'car_drivers',
+    multi: true,
   }
 }

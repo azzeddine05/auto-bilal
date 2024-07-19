@@ -69,8 +69,8 @@ services:
       - traefik.http.services.api.loadbalancer.server.port=3030
     stdin_open: true
     tty: true
-    # volumes:
-      # - ./:/usr/src/app
+    volumes:
+      - ./:/usr/src/app
 
 networks:
   bilal_auto_network:

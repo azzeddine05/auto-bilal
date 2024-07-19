@@ -4,14 +4,14 @@ import { authenticate } from '@feathersjs/authentication'
 import { hooks as schemaHooks } from '@feathersjs/schema'
 
 import {
-  packageDataValidator,
-  packagePatchValidator,
-  packageQueryValidator,
-  packageResolver,
-  packageExternalResolver,
   packageDataResolver,
+  packageDataValidator,
+  packageExternalResolver,
   packagePatchResolver,
-  packageQueryResolver
+  packagePatchValidator,
+  packageQueryResolver,
+  packageQueryValidator,
+  packageResolver
 } from './packages.schema'
 
 import type { Application } from '../../declarations'
@@ -45,8 +45,24 @@ export const packageService = (app: Application) => {
       all: [schemaHooks.validateQuery(packageQueryValidator), schemaHooks.resolveQuery(packageQueryResolver)],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(packageDataValidator), schemaHooks.resolveData(packageDataResolver)],
-      patch: [schemaHooks.validateData(packagePatchValidator), schemaHooks.resolveData(packagePatchResolver)],
+      create: [schemaHooks.validateData(packageDataValidator), schemaHooks.resolveData(packageDataResolver), 
+        (context) => {
+          // @ts-ignore
+          if (context?.data?.features) {
+            // @ts-ignore
+            context.data.features = JSON.stringify(context.data.features);
+          }
+        }
+      ],
+      patch: [schemaHooks.validateData(packagePatchValidator), schemaHooks.resolveData(packagePatchResolver), 
+        (context) => {
+          // @ts-ignore
+          if (context?.data?.features) {
+            // @ts-ignore
+            context.data.features = JSON.stringify(context.data.features);
+          }
+        }
+      ],
       remove: []
     },
     after: {
