@@ -18,7 +18,7 @@ const app: Application = koa(feathers())
 app.configure(configuration(configurationValidator))
 
 // Set up Koa middleware
-const origins = app.get('origins')?.[0];
+const origins = process.env.ORIGINS ?? app.get('origins')?.[0];
 
 app.use(
   cors({

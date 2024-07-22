@@ -49,7 +49,6 @@ export const driverResolver = resolve<Driver, HookContext<DriverService>>({})
 
 export const driverExternalResolver = resolve<Driver, HookContext<DriverService>>({
   cars: async (value, driver, context) => {
-    console.log('value', driver?.id);
     const cars = await context.app.service('car_drivers').find({
       query: {
         $skip: 0,
