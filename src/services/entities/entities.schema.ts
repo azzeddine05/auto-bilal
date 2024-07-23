@@ -69,6 +69,7 @@ export const entityPatchResolver = resolve<Entity, HookContext<EntityService>>({
 
 // Schema for allowed query properties
 export const entityQueryProperties = Type.Pick(entitySchema, [
+  'id',
   'name',
   'siren',
   'siret',
@@ -84,7 +85,19 @@ export const entityQueryProperties = Type.Pick(entitySchema, [
 ])
 export const entityQuerySchema = Type.Intersect(
   [
-    querySyntax(entityQueryProperties),
+    querySyntax(entityQueryProperties, {
+      name: { $like: Type.String() },
+      siren: { $like: Type.String() },
+      siret: { $like: Type.String() },
+      email: { $like: Type.String() },
+      address: { $like: Type.String() },
+      postal_code: { $like: Type.String() },
+      city: { $like: Type.String() },
+      country: { $like: Type.String() },
+      representative_first_name: { $like: Type.String() },
+      representative_last_name: { $like: Type.String() },
+      representative_email: { $like: Type.String() }
+    }),
     // Add additional query properties here
     Type.Object({}, { additionalProperties: false })
   ],

@@ -36,30 +36,37 @@ export const packageService = (app: Application) => {
   app.service(packagePath).hooks({
     around: {
       all: [
-        authenticate('jwt'),
         schemaHooks.resolveExternal(packageExternalResolver),
         schemaHooks.resolveResult(packageResolver)
-      ]
+      ],
+      create: [authenticate('jwt')],
+      update: [authenticate('jwt')],
+      patch: [authenticate('jwt')],
+      remove: [authenticate('jwt')]
     },
     before: {
       all: [schemaHooks.validateQuery(packageQueryValidator), schemaHooks.resolveQuery(packageQueryResolver)],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(packageDataValidator), schemaHooks.resolveData(packageDataResolver), 
+      create: [
+        schemaHooks.validateData(packageDataValidator),
+        schemaHooks.resolveData(packageDataResolver),
         (context) => {
           // @ts-ignore
           if (context?.data?.features) {
             // @ts-ignore
-            context.data.features = JSON.stringify(context.data.features);
+            context.data.features = JSON.stringify(context.data.features)
           }
         }
       ],
-      patch: [schemaHooks.validateData(packagePatchValidator), schemaHooks.resolveData(packagePatchResolver), 
+      patch: [
+        schemaHooks.validateData(packagePatchValidator),
+        schemaHooks.resolveData(packagePatchResolver),
         (context) => {
           // @ts-ignore
           if (context?.data?.features) {
             // @ts-ignore
-            context.data.features = JSON.stringify(context.data.features);
+            context.data.features = JSON.stringify(context.data.features)
           }
         }
       ],
