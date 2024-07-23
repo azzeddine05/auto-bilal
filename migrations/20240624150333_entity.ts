@@ -4,20 +4,20 @@ import type { Knex } from 'knex'
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('entities', (table) => {
     table.increments('id')
-    
+
     table.string('name').notNullable()
-    table.string('siren').notNullable()
-    table.string('siret').notNullable()
-    table.string('email').notNullable()
+    table.string('siren').nullable()
+    table.string('siret').nullable()
+    table.string('email').nullable()
     table.string('address').notNullable()
     table.string('postal_code').notNullable()
     table.string('city').notNullable()
     table.string('country').notNullable()
-    table.string('logo').notNullable()
+    table.string('logo').nullable()
 
-    table.integer('representative_first_name')
-    table.integer('representative_last_name')
-    table.integer('representative_email')
+    table.string('representative_first_name').nullable()
+    table.string('representative_last_name').nullable()
+    table.string('representative_email').nullable()
 
     table.integer('parent_id').unsigned().references('entities.id').nullable()
 

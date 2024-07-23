@@ -27,7 +27,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string('city').notNullable()
     table.string('country').notNullable()
 
-    table.string('plate_number').notNullable()
+    table.string('plate_number').nullable()
     table.string('reference_1').nullable()
     table.string('reference_2').nullable()
     table.string('comment').nullable()

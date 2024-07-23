@@ -3,14 +3,15 @@ import type { Knex } from 'knex'
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('car_drivers', (table) => {
+    table.increments('id')
 
     table.integer('car_id').unsigned().references('id').inTable('cars')
     table.integer('driver_id').unsigned().references('id').inTable('drivers')
 
-    table.primary(['car_id', 'driver_id'])
+    table.unique(['car_id', 'driver_id'])
 
     table.date('start_date').notNullable()
-    table.date('end_date').notNullable()
+    table.date('end_date').nullable()
 
     table.timestamps(true, true)
   })
