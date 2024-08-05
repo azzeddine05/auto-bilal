@@ -38,7 +38,8 @@ export const driverSchema = Type.Object(
     comment: Type.Optional(Type.String()),
     
     
-    cars: Type.Optional(Type.Array(Type.Any()))
+    cars: Type.Optional(Type.Array(Type.Any())),
+    entity: Type.Optional(Type.Any())
 
   },
   { $id: 'Driver', additionalProperties: false }
@@ -53,10 +54,15 @@ export const driverExternalResolver = resolve<Driver, HookContext<DriverService>
       query: {
         $skip: 0,
         $limit: 999,
-        driver_id: driver?.id
+        driver_id: driver?.id,
+        $sort: { id: 1 }
       },
     });
     return cars?.data;
+  },
+  entity: async (value, driver, context) => {
+    const entity = await context.app.service('entities').get(driver?.entity_id);
+    return entity;
   }
 })
 

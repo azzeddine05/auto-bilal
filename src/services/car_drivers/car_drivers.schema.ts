@@ -10,11 +10,14 @@ import type { CarDriverService } from './car_drivers.class'
 // Main data model schema
 export const carDriverSchema = Type.Object(
   {
-    id: Type.Number(),
+    id: Type.Optional(Type.Number()),
     car_id: Type.Number(),
     driver_id: Type.Number(),
     start_date: Type.String(),
-    end_date: Type.Optional(Type.String())
+    end_date: Type.Optional(Type.String()),
+
+    car: Type.Optional(Type.Any()),
+
   },
   { $id: 'CarDriver', additionalProperties: false }
 )
@@ -22,7 +25,12 @@ export type CarDriver = Static<typeof carDriverSchema>
 export const carDriverValidator = getValidator(carDriverSchema, dataValidator)
 export const carDriverResolver = resolve<CarDriver, HookContext<CarDriverService>>({})
 
-export const carDriverExternalResolver = resolve<CarDriver, HookContext<CarDriverService>>({})
+export const carDriverExternalResolver = resolve<CarDriver, HookContext<CarDriverService>>({
+  car: async (value, carDriver, context) => {
+    const car = await context.app.service('cars').get(carDriver.car_id);
+    return car;
+  }
+})
 
 // Schema for creating new entries
 export const carDriverDataSchema = Type.Pick(
@@ -46,6 +54,7 @@ export const carDriverPatchResolver = resolve<CarDriver, HookContext<CarDriverSe
 
 // Schema for allowed query properties
 export const carDriverQueryProperties = Type.Pick(carDriverSchema, [
+  'id',
   'car_id',
   'driver_id',
   'start_date',

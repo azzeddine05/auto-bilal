@@ -43,7 +43,20 @@ export const driver = (app: Application) => {
     },
     before: {
       all: [schemaHooks.validateQuery(driverQueryValidator), schemaHooks.resolveQuery(driverQueryResolver)],
-      find: [],
+      find: [
+        (context) => {
+          // current user
+          const user = context.params.user
+          if (user && user?.role_id === 2) {
+            context.params.query = {
+              ...context.params.query,
+              entity_id: user.entity_id
+            }
+          }
+
+          return context
+        }
+      ],
       get: [],
       create: [schemaHooks.validateData(driverDataValidator), schemaHooks.resolveData(driverDataResolver)],
       patch: [schemaHooks.validateData(driverPatchValidator), schemaHooks.resolveData(driverPatchResolver)],
