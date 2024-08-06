@@ -11,6 +11,7 @@ import type { Application } from './declarations'
 import { logError } from './hooks/log-error'
 import { postgresql } from './postgresql'
 import { services } from './services/index'
+import { createClient } from './services/users/create-client'
 
 const app: Application = koa(feathers())
 
@@ -41,6 +42,7 @@ app.configure(
   })
 )
 app.configure(postgresql)
+app.configure(createClient);
 app.configure(authentication)
 app.configure(services)
 app.configure(channels)
