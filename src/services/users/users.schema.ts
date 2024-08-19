@@ -25,6 +25,7 @@ export const userSchema = Type.Object(
     is_active: Type.Optional(Type.Boolean()),
     role: Type.Optional(Type.Any()),
     entity: Type.Optional(Type.Any()),
+    stats: Type.Optional(Type.Any())
   },
   { $id: 'User', additionalProperties: false }
 )
@@ -36,31 +37,103 @@ export const userExternalResolver = resolve<User, HookContext<UserService>>({
   // The password should never be visible externally
   password: async () => undefined,
   role: async (value, user: User, context) => {
-    const role = await context.app.service('roles').get(user.role_id);
-    return role;
+    const role = await context.app.service('roles').get(user.role_id)
+    return role
   },
   entity: async (value, user: User, context) => {
-    const entity = await context.app.service('entities').get(user.entity_id);
-    return entity;
+    const entity = await context.app.service('entities').get(user.entity_id)
+    return entity
   },
+  stats: async (value, user: User, context) => {
+    if (user?.role_id === 1) {
+      const clients = await context.app.service('users').find({
+        query: {
+          $skip: 0,
+          $limit: 1,
+          role_id: 2
+        }
+      })
+      const drivers = await context.app.service('drivers').find({
+        query: {
+          $skip: 0,
+          $limit: 1
+        }
+      })
+
+      const cars = await context.app.service('cars').find({
+        query: {
+          $skip: 0,
+          $limit: 1
+        }
+      })
+
+      const infractions = await context.app.service('infractions').find({
+        query: {
+          $skip: 0,
+          $limit: 1
+        }
+      })
+
+      return {
+        clients: clients?.total,
+        drivers: drivers?.total,
+        cars: cars?.total,
+        infractions: infractions?.total
+      }
+    } else {
+      const entity = await context.app.service('entities').get(user.entity_id)
+
+      const cars = await context.app.service('cars').find({
+        query: {
+          $skip: 0,
+          $limit: 1,
+          entity_id: entity.id
+        }
+      })
+      const drivers = await context.app.service('drivers').find({
+        query: {
+          $skip: 0,
+          $limit: 1,
+          entity_id: entity.id
+        }
+      })
+
+      const infractions = await context.app.service('infractions').find({
+        query: {
+          $skip: 0,
+          $limit: 1
+        }
+      })
+
+      return {
+        cars: cars?.total,
+        drivers: drivers?.total,
+        infractions: infractions?.total
+      }
+    }
+  }
 })
 
 // Schema for creating new entries
-export const userDataSchema = Type.Pick(userSchema, [
-  'email',
-  'password',
-  'first_name',
-  'last_name',
-  'role_id',
-  'entity_id',
-  'notification_new_infraction',
-  'reminder_1',
-  'reminder_2',
-  'reminder_every',
-  'is_active'
-], {
-  $id: 'UserData'
-})
+export const userDataSchema = Type.Pick(
+  userSchema,
+  [
+    'email',
+    'password',
+    'first_name',
+    'last_name',
+    'role_id',
+    'entity_id',
+    'notification_new_infraction',
+    'reminder_1',
+    'reminder_2',
+    'reminder_every',
+    'is_active'
+  ],
+  {
+    $id: 'UserData'
+  }
+)
 export type UserData = Static<typeof userDataSchema>
 export const userDataValidator = getValidator(userDataSchema, dataValidator)
 export const userDataResolver = resolve<User, HookContext<UserService>>({
@@ -107,7 +180,6 @@ export const userQueryResolver = resolve<UserQuery, HookContext<UserService>>({
   //   if (context.params.user) {
   //     return context.params.user.id
   //   }
-
   //   return value
   // }
 })

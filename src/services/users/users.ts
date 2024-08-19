@@ -16,6 +16,7 @@ import {
 
 import type { Application } from '../../declarations'
 import { UserService, getOptions } from './users.class'
+import { log } from 'console'
 
 export const userPath = 'users'
 export const userMethods: Array<keyof UserService> = ['find', 'get', 'create', 'patch', 'remove']
