@@ -43,9 +43,34 @@ export const entity = (app: Application) => {
     },
     before: {
       all: [schemaHooks.validateQuery(entityQueryValidator), schemaHooks.resolveQuery(entityQueryResolver)],
-      find: [],
+      find: [
+        (context) => {
+          // current user
+          const user = context.params.user
+          if (user && user?.role_id === 2) {
+            context.params.query = {
+              ...context.params.query,
+              user_id: user.id
+            }
+          }
+          return context
+        }
+      ],
       get: [],
-      create: [schemaHooks.validateData(entityDataValidator), schemaHooks.resolveData(entityDataResolver)],
+      create: [
+        (context) => {
+          const user = context.params.user
+          if (user) {
+            if(context.data){
+              // @ts-ignore
+              context.data.user_id = user.id;
+            }
+          }
+          return context
+        },
+        schemaHooks.validateData(entityDataValidator),
+        schemaHooks.resolveData(entityDataResolver)
+      ],
       patch: [schemaHooks.validateData(entityPatchValidator), schemaHooks.resolveData(entityPatchResolver)],
       remove: []
     },

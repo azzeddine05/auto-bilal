@@ -41,6 +41,7 @@ export const userExternalResolver = resolve<User, HookContext<UserService>>({
     return role
   },
   entity: async (value, user: User, context) => {
+    if(!user?.entity_id) return null;
     const entity = await context.app.service('entities').get(user.entity_id)
     return entity
   },
@@ -81,6 +82,7 @@ export const userExternalResolver = resolve<User, HookContext<UserService>>({
         infractions: infractions?.total
       }
     } else {
+      if(!user?.entity_id) return null;
       const entity = await context.app.service('entities').get(user.entity_id)
 
       const cars = await context.app.service('cars').find({

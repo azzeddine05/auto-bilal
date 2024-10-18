@@ -23,7 +23,8 @@ export const entitySchema = Type.Object(
     representative_first_name: Type.Optional(Type.String()),
     representative_last_name: Type.Optional(Type.String()),
     representative_email: Type.Optional(Type.String()),
-    parent_id: Type.Optional(Type.Number())
+    parent_id: Type.Optional(Type.Number()),
+    user_id: Type.Number()
   },
   { $id: 'Entity', additionalProperties: false }
 )
@@ -49,7 +50,8 @@ export const entityDataSchema = Type.Pick(
     'representative_first_name',
     'representative_last_name',
     'representative_email',
-    'parent_id'
+    'parent_id',
+    'user_id'
   ],
   {
     $id: 'EntityData'
@@ -81,7 +83,8 @@ export const entityQueryProperties = Type.Pick(entitySchema, [
   'representative_first_name',
   'representative_last_name',
   'representative_email',
-  'parent_id'
+  'parent_id',
+  'user_id'
 ])
 export const entityQuerySchema = Type.Intersect(
   [

@@ -20,7 +20,8 @@ export const carSchema = Type.Object(
     comment: Type.Optional(Type.String()),
     entry_date: Type.String(),
     exit_date: Type.Optional(Type.String()),
-    entity_id: Type.Number()
+    entity_id: Type.Number(),
+    drivers: Type.Optional(Type.Array(Type.Any()))
   },
   { $id: 'Car', additionalProperties: false }
 )

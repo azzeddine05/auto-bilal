@@ -61,6 +61,8 @@ export const driverExternalResolver = resolve<Driver, HookContext<DriverService>
     return cars?.data;
   },
   entity: async (value, driver, context) => {
+    if(!driver?.entity_id) return null;
+    
     const entity = await context.app.service('entities').get(driver?.entity_id);
     return entity;
   }
