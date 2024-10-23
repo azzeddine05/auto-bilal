@@ -24,7 +24,7 @@ export const entitySchema = Type.Object(
     representative_last_name: Type.Optional(Type.String()),
     representative_email: Type.Optional(Type.String()),
     parent_id: Type.Optional(Type.Number()),
-    user_id: Type.Number()
+    user_id: Type.Optional(Type.Number()),
   },
   { $id: 'Entity', additionalProperties: false }
 )

@@ -6,6 +6,8 @@ import type { Static } from '@feathersjs/typebox'
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
 import type { CarService } from './cars.class'
+import { app } from '../../app'
+import { Knex } from 'knex'
 
 // Main data model schema
 export const carSchema = Type.Object(
@@ -29,7 +31,21 @@ export type Car = Static<typeof carSchema>
 export const carValidator = getValidator(carSchema, dataValidator)
 export const carResolver = resolve<Car, HookContext<CarService>>({})
 
-export const carExternalResolver = resolve<Car, HookContext<CarService>>({})
+export const carExternalResolver = resolve<Car, HookContext<CarService>>({
+  drivers: async (value, car, context) => {
+    const conn = app.get('postgresqlClient') as Knex
+    const carDrivers = await conn.select('*').from('car_drivers').where('car_id', car?.id);
+
+    const promises = carDrivers?.map(async (carDriver) => {
+      return (await conn.select('*').from('drivers').where('id', carDriver.driver_id))?.[0];
+    });
+
+    const result = await Promise.all(promises);
+    
+    return result;
+    
+  }
+})
 
 // Schema for creating new entries
 export const carDataSchema = Type.Pick(

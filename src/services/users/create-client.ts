@@ -33,9 +33,13 @@ class CreateClientService {
       validatedUser.entity_id = newEntity.id
       const newUser = await userService.create(validatedUser)
 
+      const updatedEntity = await entityService.patch(newEntity.id, {
+        user_id: newUser.id
+      });
+
       return {
         user: newUser,
-        entity: newEntity,
+        entity: updatedEntity,
         message: 'Client created successfully',
         status: 'success'
       }
